@@ -20,8 +20,15 @@
 ;(run-step "hej")
 ;(run-step "kek")
 
+(defonce fns (atom {}))
 (defn keyword->symbol [kw]
   (symbol (name kw)))
+
+(defn regex->args [regex step]
+  (rest (re-find regex step)))
+
+(defn key->regex [k]
+  (re-pattern (name k)))
 
 (defn parse-args [args]
   (map keyword->symbol args))
@@ -30,21 +37,20 @@
   (let [args (parse-args arg)]
     `(fn [~@args] ~@body)))
 
-(macroexpand-1 '(create-fn (:a :b) (println a b)))
+;(macroexpand-1 '(create-fn (:a :b) (println a b)))
 
-(defn regex->args [regex step]
-  (rest (re-find regex step)))
-
-(defonce fns (atom {}))
 
 (defmacro given [regex args & body]
   `(swap! fns assoc (keyword (str ~regex))
          (create-fn ~args ~@body)))
 
-(macroexpand-1 '(given #"arg1" (:a) (println a)))
+;(macroexpand '(given #"arg1" (:a) (println a)))
 
-(given #"arg" (:a) (println a))
+(defn regexes [] (map key->regex (keys @fns)))
+
+(given #"arg (\w+)" (:a) (println a))
 
 (defn run-step [step]
-  ((get @fns step) "Hej du glade!"))
+  (let [fun (map #(re-find %1 step) (regexes))]
+  ((get @fns step) "1")))
 
