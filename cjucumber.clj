@@ -27,16 +27,23 @@
 (defn regexes [] (map key->regex (keys @fns)))
 
 (defn regex-and-args [step]
-  (map (fn [regex]
-         (let [matches (re-find regex step)]
-           (if matches
-           (list regex (drop 1 matches))
-             nil))) 
-       (regexes)))
-
-(defn run-step [step]
-  (let [fun-n-args (first (regex-and-args step))]
-  ((get @fns (regex->key (first fun-n-args))) (flatten (rest fun-n-args)))))
+  (flatten
+    (filter #(not (= nil %1))
+                  (map (fn [regex]
+                         (let [matches (re-find regex step)]
+                           (if matches
+                             (list regex (drop 1 matches))
+                             nil))) 
+                       (regexes)))))
 
 (given #"arg (\w+)" (:a) (println a))
 (given #"args (\d+) (\d+)" (:a :b) (println (str a "|" b)))
+
+(defn run-step [step]
+  (let [fun-n-args (regex-and-args step)
+        funk (get @fns (regex->key (first fun-n-args)))
+        args (rest fun-n-args)]
+    (println (flatten (funk args)))))
+    
+(run-step "args 1 2")
+
