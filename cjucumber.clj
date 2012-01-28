@@ -21,7 +21,7 @@
     `(fn [~@args] ~@body)))
 
 (defmacro given [regex args & body]
-  `(swap! fns assoc (regex->key ~regex))
+  `(swap! fns assoc (regex->key ~regex)
          (create-fn ~args ~@body)))
 
 (defn regexes [] (map key->regex (keys @fns)))
