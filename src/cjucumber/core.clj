@@ -20,7 +20,11 @@
   (let [args (parse-args arg)]
     `(fn [~@args] ~@body)))
 
-(defmacro given [regex args & body]
+(defmacro Given [regex args & body]
+  `(swap! fns assoc (regex->key ~regex)
+         (create-fn ~args ~@body)))
+
+(defmacro When [regex args & body]
   `(swap! fns assoc (regex->key ~regex)
          (create-fn ~args ~@body)))
 
