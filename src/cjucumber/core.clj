@@ -42,6 +42,7 @@
 
 (defn run-step [step]
   (let [fun-n-args (regex-and-args step)
+        identifier (re-find "\w+" step) ; Given/When/Then
         funk (get @fns (regex->key (first fun-n-args)))
         args (rest fun-n-args)]
     (eval (flatten `(~funk ~args)))))
