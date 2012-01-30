@@ -1,4 +1,4 @@
-(ns cjucumber)
+(ns cjucumber.core)
 
 (defonce fns (atom {}))
 (defn keyword->symbol [kw]

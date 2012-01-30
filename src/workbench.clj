@@ -1,5 +1,5 @@
 (ns cjucumber.workbench
-  (:use [cjucumber]))
+  (:use [cjucumber.core]))
 
 (given #"arg (\w+)" (:a) (println a))
 (given #"args (\d+) (\d+)" (:a :b) (println (str "args: [" a "|" b "]")))
