@@ -46,4 +46,5 @@
     (eval (flatten `(~funk ~args)))))
 
 (run-step "args 5 102")
+(run-step "arg 50")
 
