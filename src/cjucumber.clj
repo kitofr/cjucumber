@@ -37,13 +37,13 @@
                        (regexes)))))
 
 (given #"arg (\w+)" (:a) (println a))
-(given #"args (\d+) (\d+)" (:a :b) (println (str a "|" b)))
+(given #"args (\d+) (\d+)" (:a :b) (println (str "args: [" a "|" b "]")))
 
 (defn run-step [step]
   (let [fun-n-args (regex-and-args step)
         funk (get @fns (regex->key (first fun-n-args)))
         args (rest fun-n-args)]
-    (println (flatten (funk args)))))
-    
-(run-step "args 1 2")
+    (eval (flatten `(~funk ~args)))))
+
+(run-step "args 5 102")
 
