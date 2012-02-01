@@ -1,6 +1,8 @@
 (ns cjucumber.core)
 
-(defonce fns (atom {}))
+(defonce givens (atom {}))
+(defonce whens (atom {}))
+
 (defn keyword->symbol [kw]
   (symbol (name kw)))
 
@@ -21,16 +23,16 @@
     `(fn [~@args] ~@body)))
 
 (defmacro Given [regex args & body]
-  `(swap! fns assoc (regex->key ~regex)
+  `(swap! givens assoc (regex->key ~regex)
          (create-fn ~args ~@body)))
 
 (defmacro When [regex args & body]
-  `(swap! fns assoc (regex->key ~regex)
+  `(swap! whens assoc (regex->key ~regex)
          (create-fn ~args ~@body)))
 
-(defn regexes [] (map key->regex (keys @fns)))
+(defn regexes [hs] (map key->regex (keys hs)))
 
-(defn regex-and-args [step]
+(defn regex-and-args [step hs]
   (flatten
     (filter #(not (= nil %1))
                   (map (fn [regex]
@@ -38,12 +40,20 @@
                            (if matches
                              (list regex (drop 1 matches))
                              nil))) 
-                       (regexes)))))
+                       (regexes hs)))))
 
 (defn run-step [step]
-  (let [fun-n-args (regex-and-args step)
-        identifier (re-find #"\w+" step) ; Given/When/Then
-        funk (get @fns (regex->key (first fun-n-args)))
-        args (rest fun-n-args)]
-    (eval (flatten `(~funk ~args)))))
+  (let [identifier (re-find #"\w+" step)] ; Given/When/Then
+    (cond (= identifier "Given")
+          (do
+            (let [fun-n-args (regex-and-args step @givens)        
+                 funk (get @givens (regex->key (first fun-n-args)))
+                 args (rest fun-n-args)]
+                (eval (flatten `(~funk ~args)))))
+          (= identifier "When")
+          (do
+            (let [fun-n-args (regex-and-args step @whens)        
+                 funk (get @whens (regex->key (first fun-n-args)))
+                 args (rest fun-n-args)]
+                (eval (flatten `(~funk ~args))))))))
 

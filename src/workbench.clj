@@ -11,3 +11,4 @@
 ;should not clash with given above!
 (When #"arg (\d+)" (:x)
       (println x))
+(run-step "When arg 1234")
