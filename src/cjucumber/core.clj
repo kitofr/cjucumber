@@ -42,18 +42,16 @@
                              nil))) 
                        (regexes hs)))))
 
+(defn execute-step [step hs]
+  (let [fun-n-args (regex-and-args step hs)        
+        funk (get hs (regex->key (first fun-n-args)))
+        args (rest fun-n-args)]
+    (eval (flatten `(~funk ~args)))))
+
 (defn run-step [step]
   (let [identifier (re-find #"\w+" step)] ; Given/When/Then
     (cond (= identifier "Given")
-          (do
-            (let [fun-n-args (regex-and-args step @givens)        
-                 funk (get @givens (regex->key (first fun-n-args)))
-                 args (rest fun-n-args)]
-                (eval (flatten `(~funk ~args)))))
+          (execute-step step @givens)
           (= identifier "When")
-          (do
-            (let [fun-n-args (regex-and-args step @whens)        
-                 funk (get @whens (regex->key (first fun-n-args)))
-                 args (rest fun-n-args)]
-                (eval (flatten `(~funk ~args))))))))
+          (execute-step step @whens))))
 
