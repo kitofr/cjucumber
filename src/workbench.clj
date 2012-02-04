@@ -1,15 +1,21 @@
 (ns cjucumber.workbench
   (:use [cjucumber.core]))
 
-(Given #"arg (\w+)" (:a) 
-       (assert (< 5 a)))
+(defonce a (ref nil))
+(defonce b (ref nil))
+(defonce result (ref nil))
 
-(Given #"args (\d+) (\d+)" (:a :b) (println (str "args: [" a "|" b "]")))
+(Given #"a = (\d+) and b = (\d+)" (:a1 :b1) 
+       (do 
+         (dosync (ref-set a (int a1)))
+         (dosync (ref-set b (int b1)))))
 
-;should not clash with given above!
-(When #"arg (\d+)" (:x)
-      (println x))
+(When #"I execute a \+ b" ()
+  (dosync (ref-set result (+ @a @b))))
 
-(run-step "Given arg 50")
-(run-step "Given args 5 102")
-(run-step "When arg 1234")
+(Then #"the result is = (\d+)" (:x)
+      (assert (= (int x) @result)))
+
+(run-step "Given a = 1 and b = 2")
+(run-step "When I execute a + b")
+(run-step "Then the result is = 3")

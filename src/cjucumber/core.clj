@@ -2,6 +2,7 @@
 
 (defonce givens (atom {}))
 (defonce whens (atom {}))
+(defonce thens (atom {}))
 
 (defn keyword->symbol [kw]
   (symbol (name kw)))
@@ -24,23 +25,31 @@
 
 (defmacro Given [regex args & body]
   `(swap! givens assoc (regex->key ~regex)
-         (create-fn ~args ~@body)))
+          (create-fn ~args ~@body)))
 
 (defmacro When [regex args & body]
   `(swap! whens assoc (regex->key ~regex)
-         (create-fn ~args ~@body)))
+          (create-fn ~args ~@body)))
+
+(defmacro Then [regex args & body]
+  `(swap! thens assoc (regex->key ~regex)
+          (create-fn ~args ~@body)))
 
 (defn regexes [hs] (map key->regex (keys hs)))
 
 (defn regex-and-args [step hs]
   (flatten
     (filter #(not (= nil %1))
-                  (map (fn [regex]
-                         (let [matches (re-find regex step)]
-                           (if matches
-                             (list regex (drop 1 matches))
-                             nil))) 
-                       (regexes hs)))))
+            (map (fn [regex]
+                   (let [matches (re-find regex step)]
+                     (if matches 
+                       (cond 
+                         (= (class matches) System.String)
+                         (list regex)
+                         :else 
+                         (list regex (drop 1 matches)))
+                       nil))) 
+                 (regexes hs)))))
 
 (defn execute-step [step hs]
   (let [fun-n-args (regex-and-args step hs)        
@@ -49,9 +58,11 @@
     (eval (flatten `(~funk ~args)))))
 
 (defn run-step [step]
-  (let [identifier (re-find #"\w+" step)] ; Given/When/Then
+  (let [identifier (re-find #"\w+" step)] 
     (cond (= identifier "Given")
           (execute-step step @givens)
           (= identifier "When")
-          (execute-step step @whens))))
+          (execute-step step @whens)
+          (= identifier "Then")
+          (execute-step step @thens))))
 
