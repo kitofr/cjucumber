@@ -1,5 +1,5 @@
 (ns cjucumber.workbench
-  (:use [cjucumber.core]))
+  (:use [cjucumber.core cjucumber.runner]))
 
 (Given #"a = (\d+) and b = (\d+)" (:x :y) 
        (do 
