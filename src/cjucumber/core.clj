@@ -1,9 +1,6 @@
 (ns cjucumber.core)
 
-(defonce givens (atom {}))
-(defonce whens (atom {}))
-(defonce thens (atom {}))
-
+; --- Helpers ---
 (defn keyword->symbol [kw]
   (symbol (name kw)))
 
@@ -18,22 +15,6 @@
 
 (defn parse-args [args]
   (map keyword->symbol args))
-
-(defmacro create-fn [arg & body]
-  (let [args (parse-args arg)]
-    `(fn [~@args] ~@body)))
-
-(defmacro Given [regex args & body]
-  `(swap! givens assoc (regex->key ~regex)
-         (create-fn ~args ~@body)))
-
-(defmacro When [regex args & body]
-  `(swap! whens assoc (regex->key ~regex)
-         (create-fn ~args ~@body)))
-
-(defmacro Then [regex args & body]
-  `(swap! thens assoc (regex->key ~regex)
-         (create-fn ~args ~@body)))
 
 (defn regexes [hs] (map key->regex (keys hs)))
 
@@ -51,6 +32,27 @@
                              nil))) 
                        (regexes hs)))))
 
+; --- Macros ---
+(defmacro create-fn [arg & body]
+  (let [args (parse-args arg)]
+    `(fn [~@args] ~@body)))
+
+(defonce givens (atom {}))
+(defmacro Given [regex args & body]
+  `(swap! givens assoc (regex->key ~regex)
+         (create-fn ~args ~@body)))
+
+(defonce whens (atom {}))
+(defmacro When [regex args & body]
+  `(swap! whens assoc (regex->key ~regex)
+         (create-fn ~args ~@body)))
+
+(defonce thens (atom {}))
+(defmacro Then [regex args & body]
+  `(swap! thens assoc (regex->key ~regex)
+         (create-fn ~args ~@body)))
+
+; ---  Step/Feature running ---
 (defn execute-step [step hs]
   (let [fun-n-args (regex-and-args step hs)        
         funk (get hs (regex->key (first fun-n-args)))

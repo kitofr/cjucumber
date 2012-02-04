@@ -1,10 +1,10 @@
 (ns cjucumber.workbench
   (:use [cjucumber.core]))
 
-(Given #"a = (\d+) and b = (\d+)" (:a1 :b1) 
+(Given #"a = (\d+) and b = (\d+)" (:x :y) 
        (do 
-         (def a a1)
-         (def b b1)))
+         (def a x)
+         (def b y)))
 
 (When #"I execute a \+ b" ()
   (def result (+ a b)))
