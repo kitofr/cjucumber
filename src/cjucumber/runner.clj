@@ -1,5 +1,6 @@
 (ns cjucumber.runner
-  (:use [cjucumber.core]))
+  (:use cjucumber.helpers
+        cjucumber.core))
 
 (defn execute-step [step hs]
   (let [fun-n-args (regex-and-args step hs)        
