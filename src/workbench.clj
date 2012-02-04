@@ -1,4 +1,4 @@
-(ns cjucumber.workbench
+(ns workbench
   (:use cjucumber.core 
         cjucumber.runner))
 
