@@ -25,31 +25,31 @@
 
 (defmacro Given [regex args & body]
   `(swap! givens assoc (regex->key ~regex)
-          (create-fn ~args ~@body)))
+         (create-fn ~args ~@body)))
 
 (defmacro When [regex args & body]
   `(swap! whens assoc (regex->key ~regex)
-          (create-fn ~args ~@body)))
+         (create-fn ~args ~@body)))
 
 (defmacro Then [regex args & body]
   `(swap! thens assoc (regex->key ~regex)
-          (create-fn ~args ~@body)))
+         (create-fn ~args ~@body)))
 
 (defn regexes [hs] (map key->regex (keys hs)))
 
 (defn regex-and-args [step hs]
   (flatten
     (filter #(not (= nil %1))
-            (map (fn [regex]
-                   (let [matches (re-find regex step)]
-                     (if matches 
-                       (cond 
-                         (= (class matches) System.String)
-                         (list regex)
-                         :else 
-                         (list regex (drop 1 matches)))
-                       nil))) 
-                 (regexes hs)))))
+                  (map (fn [regex]
+                         (let [matches (re-find regex step)]
+                           (if matches 
+                             (cond 
+                               (= (class matches) System.String)
+                                (list regex)
+                              :else 
+                                (list regex (drop 1 matches)))
+                             nil))) 
+                       (regexes hs)))))
 
 (defn execute-step [step hs]
   (let [fun-n-args (regex-and-args step hs)        
