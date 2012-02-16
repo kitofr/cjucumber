@@ -13,6 +13,7 @@
 (Then #"the result is = (\d+)" (:x)
       (assert (= (int x) result)))
 
+(println "\nRunning steps:")
 (run-step "Given a = 1 and b = 2")
 (run-step "When I execute a + b")
 (run-step "Then the result is = 3")
