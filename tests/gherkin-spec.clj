@@ -10,8 +10,9 @@
     (apply str (flatten `(~words ~(last stripped))))))
 
 (defn gherkin-parse [input]
-  (let [feature (second (re-find #"Feature: ([A-Za-z\s+]+)Scenario:" input))]
-    { :feature (remove-ws feature) }))
+  (let [feature (second (re-find #"Feature: ([A-Za-z\s+]+)Scenario:" input))
+        scenario (second (re-find #"Scenario: ([A-Za-z\s+]+)Given" input))]
+    { :feature (remove-ws feature) :scenario (remove-ws scenario)}))
 
 
 (def feature-file 
@@ -24,9 +25,10 @@
   Then it parses given/when/then as separate steps
   ")
 
-(deftest feature-definition-should-be-first
+(deftest feature-file-parsing
          (let [content (gherkin-parse feature-file)]
-           (is (= (content :feature) "In order to be able to read in feature files I would like cjucumber to parse gherkin grammar correctly"))))
+           (is (= (content :feature) "In order to be able to read in feature files I would like cjucumber to parse gherkin grammar correctly"))
+           (is (= (content :scenario) "Scenarios can have a title"))))
 
 (deftest remove-ws-should-strip-wses
          (is (= "all 4 one, one 4 all!" (remove-ws "all    4\n one, \t\r one 4 all!\n"))))
