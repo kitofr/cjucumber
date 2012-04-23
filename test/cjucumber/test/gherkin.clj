@@ -21,6 +21,6 @@
 (deftest remove-ws-should-strip-wses
          (is (= "all 4 one, one 4 all!" (remove-ws "all    4\n one, \t\r one 4 all!\n"))))
 
-(run-tests)
+;(run-tests)
 
 ;(gherkin-parse feature-file)
