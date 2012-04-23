@@ -43,4 +43,4 @@
 
 (run-tests)
 
-(gherkin-parse feature-file)
+;(gherkin-parse feature-file)
