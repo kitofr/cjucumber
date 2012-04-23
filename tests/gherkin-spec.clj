@@ -9,14 +9,17 @@
         words (map #(str %1 " ") (drop-last stripped))]
     (apply str (flatten `(~words ~(last stripped))))))
 
+(defn strip[regex input]
+  (remove-ws (second (re-find regex input))))
+
 (defn gherkin-parse [input]
-  (letfn strip[regex input]
-    (second (re-find regex input)))
   (let [feature (strip #"Feature: ([A-Za-z\s+]+)Scenario:" input)
         scenario (strip #"Scenario: ([A-Za-z\s+]+)Given" input)
-        steps '(1 2 3)]
-    { :feature (remove-ws feature),
-      :scenario { :title (remove-ws scenario), :steps steps }}))
+        steps [(strip #"(Given [A-Za-z\s+]+)When" input)
+               (strip #"(When [A-Za-z\s+]+)Then" input)
+               (strip #"(Then [A-Za-z\s+]+)" input)]]
+    { :feature feature,
+      :scenario { :title scenario, :steps steps }}))
 
 
 (def feature-file 
@@ -39,3 +42,5 @@
          (is (= "all 4 one, one 4 all!" (remove-ws "all    4\n one, \t\r one 4 all!\n"))))
 
 (run-tests)
+
+(gherkin-parse feature-file)
