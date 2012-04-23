@@ -1,6 +1,6 @@
-(ns gerkin-spec
-  (:use clojure.test)
-  (:require cjucumber.gherkin))
+(ns cjucumber.test.gherkin
+  (:use [cjucumber.gherkin])
+  (:use [clojure.test]))
 
 (def feature-file 
   "Feature: In order to be able to read in feature files
