@@ -1,1 +1,3 @@
+.lein*
 *.swp
+lib/
